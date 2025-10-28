@@ -1,8 +1,7 @@
 import java.util.ArrayList;
 
-public class SortingLibrary<T extends Comparable <T>> {
-    
-    public static ArrayList<ArrayList<String>> nQueen(int n, int row, int[][] board) {
+public class BacktrackSolver extends NQueensSolver{
+    public  ArrayList<ArrayList<String>> nQueen(int n, int row, int[][] board,ArrayList<ArrayList<String>> result) {
         //This program should itterate through every row,
         //attempt to place a queen in the current row and column then check if its okay to stay there
         //if its okay to place there add it to the board an int[][] , then call itself again but pass in an increased row
@@ -10,8 +9,7 @@ public class SortingLibrary<T extends Comparable <T>> {
         //after we reach the last row return the solutions found
         //to check if a spot is safe make sure it doesnt share and x or y with the new queen, then check diagonals
 
-        //Big o is probably O((N(Log(N)^2) + n^2) i feel like this is wrong but i do think i have the pieces correct
-        ArrayList<ArrayList<String>> result = new ArrayList<>();
+        //Big o is probably O((N(Log(N)^2) + n^2)) i feel like this is wrong but i do think i have the pieces correct
 
         if (row == n) {
             ArrayList<String> solution = new ArrayList<>();
@@ -30,14 +28,14 @@ public class SortingLibrary<T extends Comparable <T>> {
             Queen queen = new Queen(new int[]{row, column});
             if (isSafeToPlace(queen, board)) { //n (isSafeToPlace)
                 board[row][column] = 1;
-                result.addAll(nQueen(n, row + 1, board)); //Log(n)
+                nQueen(n, row + 1, board, result);
                 board[row][column] = 0;
             }
         }
         return result;
     }
 
-    public static boolean isSafeToPlace(Queen queen, int[][] board) {
+    public  boolean isSafeToPlace(Queen queen, int[][] board) {
         int row = queen.position[0];
         int column = queen.position[1];
         int n = board.length;
@@ -62,14 +60,4 @@ public class SortingLibrary<T extends Comparable <T>> {
         return true;
     }
 
-    public static ArrayList<ArrayList<String>> nQueenStarter(int n) {
-        int[][] board = new int[n][n];
-        ArrayList<ArrayList<String>> solutions = nQueen(n, 0, board);
-        System.out.println(solutions.size() + " solutions found:");
-       return solutions;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(nQueenStarter(4));
-    }
 }
