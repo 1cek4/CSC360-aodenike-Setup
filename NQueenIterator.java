@@ -25,6 +25,7 @@ public class NQueenIterator implements Iterator<ArrayList<String>> {
         }
         return nextSolution != null;
     }
+    
     @Override
     public ArrayList<String> next() {
         if (nextSolution == null) {
