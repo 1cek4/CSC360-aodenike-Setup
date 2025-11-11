@@ -1,128 +1,86 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Stack;
 
 public class NQueenIterator implements Iterator<ArrayList<String>> {
 
-    int n;
-    int[][] board;
-    Stack<Integer> columnStack;
-    boolean hasNext;
-    ArrayList<String> nextSolution;
+    private final int n;
+    private final int[] columns; 
+    private int currentRow;
+    private boolean finished;
+    private ArrayList<String> nextSolution;
 
     public NQueenIterator(int n) {
         this.n = n;
-        this.board = new int[n][n];
-        this.columnStack = new Stack<>();
-        this.hasNext = true;
+        this.columns = new int[n];
+        Arrays.fill(this.columns, -1);
+        this.currentRow = 0;
+        this.finished = false;
         this.nextSolution = null;
     }
 
-    @Override 
+    @Override
     public boolean hasNext() {
-        if (nextSolution == null) {
-            nextSolution = findNextSolution();
-        }
+        if (nextSolution != null) return true;
+        if (finished) return false;
+        nextSolution = findNextSolution();
+        if (nextSolution == null) finished = true;
         return nextSolution != null;
     }
-    
+
     @Override
     public ArrayList<String> next() {
-        if (nextSolution == null) {
-            nextSolution = findNextSolution();
-        }
-        ArrayList<String> result = nextSolution;
+        if (!hasNext()) return null;
+        ArrayList<String> r = nextSolution;
         nextSolution = null;
-        return result;
+        return r;
     }
 
-    public ArrayList<String> findNextSolution(){
-         while (true) {
-            int currentRow = columnStack.size() - 1;
-            
-            if (currentRow < 0) {
-                return null;
+    private ArrayList<String> findNextSolution() {
+        while (currentRow >= 0) {
+            columns[currentRow]++;
+
+            while (columns[currentRow] < n && !isSafeToPlace(currentRow, columns[currentRow])) {
+                columns[currentRow]++;
             }
-            
-            if (currentRow == n) {
-                ArrayList<String> solution = new ArrayList<>();
-                for (int[] boardRow : board) {
-                    StringBuilder sb = new StringBuilder();
-                    for (int val : boardRow) {
-                        sb.append(val == 1 ? "Q" : ".");
-                    }
-                    solution.add(sb.toString());
+
+            if (columns[currentRow] < n) {
+                if (currentRow == n - 1) {
+                    ArrayList<String> solution = buildSolution();
+                    return solution;
+                } else {
+                    currentRow++;
+                    columns[currentRow] = -1;
                 }
-                
-                backtrack();
-                
-                return solution;
-            }
-            
-            int lastColumn = columnStack.pop();
-            int nextColumn = lastColumn + 1;
-            
-            boolean placedQueen = false;
-            for (int col = nextColumn; col < n; col++) {
-                Queen queen = new Queen(new int[]{currentRow, col});
-                if (isSafeToPlace(queen, board)) {
-                   
-                    board[currentRow][col] = 1;
-                    columnStack.push(col);
-                    columnStack.push(-1);
-                    placedQueen = true;
-                    break;
-                }
-            }
-            
-            if (!placedQueen) {
-                if (currentRow == 0) {
-                    return null;
-                }
-                backtrack();
+            } else {
+                columns[currentRow] = -1;
+                currentRow--;
             }
         }
+
+        return null; 
     }
-    
-    private void backtrack() {
-        if (!columnStack.isEmpty()) {
-            columnStack.pop();
-        }
-        
-        if (!columnStack.isEmpty()) {
-            int prevRow = columnStack.size() - 1;
-            int prevCol = columnStack.peek();
-            if (prevRow >= 0 && prevCol >= 0 && prevRow < n && prevCol < n) {
-                board[prevRow][prevCol] = 0;
+
+    private ArrayList<String> buildSolution() {
+        ArrayList<String> sol = new ArrayList<>();
+        for (int r = 0; r < n; r++) {
+            StringBuilder sb = new StringBuilder();
+            for (int c = 0; c < n; c++) {
+                sb.append(columns[r] == c ? 'Q' : '.');
             }
+            sol.add(sb.toString());
         }
+        return sol;
     }
-    
-    private static boolean isSafeToPlace(Queen queen, int[][] board) {
-        int row = queen.position[0];
-        int column = queen.position[1];
-        int n = board.length;
 
-        for (int i = 0; i < row; i++) {
-            if (board[i][column] == 1) {
-                return false;
-            }
-        }
-
-        for (int i = row - 1, j = column - 1; i >= 0 && j >= 0; i--, j--) {
-            if (board[i][j] == 1) {
-                return false;
-            }
-        }
-
-        for (int i = row - 1, j = column + 1; i >= 0 && j < n; i--, j++) {
-            if (board[i][j] == 1) {
-                return false;
-            }
+    private boolean isSafeToPlace(int row, int col) {
+        for (int r = 0; r < row; r++) {
+            int c = columns[r];
+            if (c == col) return false;
+            if (Math.abs(r - row) == Math.abs(c - col)) return false; 
         }
         return true;
     }
-    
-
-
 }
+
+
