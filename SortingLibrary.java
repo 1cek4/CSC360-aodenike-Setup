@@ -61,15 +61,4 @@ public class SortingLibrary<T extends Comparable <T>> {
         }
         return true;
     }
-
-    public static ArrayList<ArrayList<String>> nQueenStarter(int n) {
-        int[][] board = new int[n][n];
-        ArrayList<ArrayList<String>> solutions = nQueen(n, 0, board);
-        System.out.println(solutions.size() + " solutions found:");
-       return solutions;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(nQueenStarter(4));
-    }
 }
