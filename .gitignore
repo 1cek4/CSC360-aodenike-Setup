@@ -1,0 +1,9 @@
+# Ignore Java compiled class files
+*.class
+
+# IDE and build output
+.idea/
+out/
+
+# IntelliJ project files
+*.iml
